@@ -63,7 +63,40 @@ router.get('/', (req, res) => {
 
 // GET - only a single movie based on ID
 router.get('/details/:id', (req, res) => {
-  res.send({ movie: {} });
+  const queryText = `SELECT * FROM "movies"
+    WHERE "movies".id = $1;`;
+  const movieId = req.params.id;
+
+  pool
+    .query(queryText, [movieId])
+    .then((dbResponse) => {
+      // res.send(dbResponse.rows);
+      const movieDetails = dbResponse.rows[0];
+
+      const queryText2 = `SELECT "genres".id, "genres".name FROM "genres"
+      JOIN "movies_genres" ON "genres".id = "movies_genres".genres_id
+      WHERE "movies_genres".movies_id = $1;`;
+
+      // QUERY FOR GENRES
+      pool
+        .query(queryText2, [movieId])
+        .then((dbResponse) => {
+          const movieGenres = dbResponse.rows;
+
+          res.send({
+            ...movieDetails,
+            genres: movieGenres,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.sendStatus(500);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
 });
 
 module.exports = router;
