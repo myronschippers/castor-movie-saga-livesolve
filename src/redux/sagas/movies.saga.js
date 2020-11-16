@@ -17,8 +17,27 @@ function* getAllMovies(action) {
   }
 }
 
+function* getMovieDetails(action) {
+  try {
+    const movieDetails = yield Axios.get(
+      `/api/movie/details/${action.payload}`
+    );
+    yield dispatch({
+      type: 'SET_MOVIE_DETAILS',
+      payload: movieDetails.data,
+    });
+  } catch (err) {
+    console.log(err);
+    yield dispatch({
+      type: 'SET_ERROR',
+      payload: 'Could not get Movie Details!!!',
+    });
+  }
+}
+
 function* getMovieSaga() {
   yield takeLatest('GET_MOVIES', getAllMovies);
+  yield takeLatest('GET_MOVIE_DETAILS', getMovieDetails);
 }
 
 export default getMovieSaga;
