@@ -50,7 +50,15 @@ router.post('/', (req, res) => {
 
 // GET - all movies returned
 router.get('/', (req, res) => {
-  res.send({ movies: [] });
+  pool
+    .query(`SELECT * FROM "movies" ORDER BY "title" ASC;`)
+    .then((dbResponse) => {
+      res.send(dbResponse.rows);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
 });
 
 // GET - only a single movie based on ID
