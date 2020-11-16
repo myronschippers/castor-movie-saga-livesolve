@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import {
   Card,
@@ -19,26 +20,36 @@ const styling = (theme) =>
   });
 
 class MovieListItem extends Component {
+  handleGoToDetails = (event) => {
+    this.props.history.push(`/details/${this.props.movie.id}`);
+  };
+
   render() {
     const { movie, classes } = this.props;
 
     return (
       <Card>
-        <CardActionArea>
+        <CardActionArea onClick={this.handleGoToDetails}>
           <CardMedia
             className={classes.imgMedia}
             image={movie.poster}
             title={movie.title}
           />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {movie.title}
-            </Typography>
-          </CardContent>
         </CardActionArea>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2">
+            {movie.title}
+          </Typography>
+        </CardContent>
       </Card>
     );
   }
 }
 
-export default withStyles(styling)(connect()(MovieListItem));
+export default withStyles(styling)(
+  // connect to redux dispatch
+  connect()(
+    // for using this.props.history
+    withRouter(MovieListItem)
+  )
+);
